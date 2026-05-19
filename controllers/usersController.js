@@ -4,6 +4,9 @@ import validator from "validator";
 import jwt from 'jsonwebtoken'
 import { generateToken } from "../utils/generateToken.js";
 
+
+// Common Routes
+
 export const signUp = async (req, res) => {
   // const fullName = req.body.fullName
   // const age = req.body.age
@@ -102,7 +105,7 @@ export const login = async (req, res) => {
     // Generates JWT ( Token )
     // sign(PAYLOAD , SECRET_KEY , EXPIRES_IS)
     // const token = jwt.sign({id : existingUser._id , email : existingUser.email} , 'super_secret_key' , {expiresIn : '1d'})
-    const token = generateToken({id : existingUser._id , email : existingUser.email})
+    const token = generateToken({id : existingUser._id , email : existingUser.email , role : existingUser.role})
     console.log(token)
     res.status(200).json({ user : existingUser , token});
   } catch (error) {
@@ -127,6 +130,11 @@ export const getProfile = async (req, res) => {
   }
 };
 
+
+
+// Admin Routes
+
+
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
@@ -136,3 +144,19 @@ export const getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Internal server error !" });
   }
 };
+
+
+export const deactivate = async (req , res) => {
+
+  const { id } = req.params
+
+  try {
+
+    const user = await User.findByIdAndUpdate(id , { isActive : false } , { new : true })
+
+    res.status(200).json({message : 'User account deactivated' , user})
+    
+  } catch (error) {
+    res.status(500).json({message : 'Internal server error'})
+  }
+}
